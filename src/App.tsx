@@ -140,14 +140,16 @@ function App() {
             </div>
           ) : null}
 
-          <Toolbar
-            decompositionEnabled={decompositionEnabled}
-            labelsVisible={labelsVisible}
-            loadPathActive={loadPathActive}
-            onToggleDecomposition={toggleDecomposition}
-            onToggleLabels={toggleLabels}
-            onToggleLoadPath={toggleLoadPath}
-          />
+          {displayMode === "3d" ? (
+            <Toolbar
+              decompositionEnabled={decompositionEnabled}
+              labelsVisible={labelsVisible}
+              loadPathActive={loadPathActive}
+              onToggleDecomposition={toggleDecomposition}
+              onToggleLabels={toggleLabels}
+              onToggleLoadPath={toggleLoadPath}
+            />
+          ) : null}
 
           {isImmersive ? (
             <button
