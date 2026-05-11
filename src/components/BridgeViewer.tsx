@@ -33,7 +33,7 @@ export function BridgeViewer() {
       dpr={[1, 1.8]}
       shadows="basic"
     >
-      <color attach="background" args={["#f8fbff"]} />
+      <color attach="background" args={["#f5f2ea"]} />
       <ambientLight intensity={0.62} />
       <directionalLight
         castShadow
@@ -76,7 +76,7 @@ function BridgeModel() {
     const inLoadPath = activeLoadId === id;
 
     return {
-      color: inLoadPath ? "#f2b33d" : selected ? "#2877d4" : hovered ? "#69aef6" : baseColor,
+      color: inLoadPath ? "#c8882a" : selected ? "#8d9b6e" : hovered ? "#adc088" : baseColor,
       opacity: inactive ? 0.18 : selected ? 0.82 : 1,
       transparent: inactive || selected,
       roughness: 0.62,
@@ -362,10 +362,10 @@ function BridgeDiagram2D() {
       <svg viewBox="0 0 900 520" role="img" aria-label={`${getTwoDModeLabel(activeView)}桥梁二维结构示意图`}>
         <defs>
           <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="10" floodColor="#0d3768" floodOpacity="0.14" stdDeviation="10" />
+            <feDropShadow dx="0" dy="8" floodColor="#363d1f" floodOpacity="0.1" stdDeviation="8" />
           </filter>
           <pattern id="diagramGrid" width="24" height="24" patternUnits="userSpaceOnUse">
-            <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#dfe8f2" strokeWidth="1" />
+            <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#d4cec4" strokeWidth="1" />
           </pattern>
         </defs>
         <rect className="diagram-bg" width="900" height="520" rx="24" />

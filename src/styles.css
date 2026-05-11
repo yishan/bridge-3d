@@ -1,21 +1,25 @@
 :root {
-  color: #14284a;
-  background: #eff4fa;
+  color: #4e463c;
+  background: #f5f2ea;
   font-family:
-    Inter, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", system-ui, sans-serif;
+    "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", system-ui, sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  --blue-900: #083c82;
-  --blue-800: #0b4c99;
-  --blue-700: #0f61bb;
-  --blue-600: #1976d2;
-  --blue-100: #e6f1ff;
-  --panel: rgba(255, 255, 255, 0.92);
-  --border: #d7e2ee;
-  --text: #14284a;
-  --muted: #64748b;
-  --shadow: 0 18px 42px rgba(24, 58, 99, 0.14);
+  --sage-900: #363d1f;
+  --sage-800: #4a5228;
+  --sage-700: #6f7c33;
+  --sage-600: #8d9b6e;
+  --sage-100: #ebf0df;
+  --panel: rgba(252, 250, 244, 0.97);
+  --border: #d7d1c6;
+  --text: #4e463c;
+  --muted: #a9a397;
+  --shadow: 0 16px 40px rgba(58, 50, 35, 0.09);
+  --shadow-sm: 0 4px 16px rgba(58, 50, 35, 0.07);
+  --radius-panel: 14px;
+  --radius-card: 12px;
+  --radius-btn: 12px;
 }
 
 * {
@@ -39,13 +43,20 @@ button {
   font: inherit;
 }
 
+/* ── Serif headings per design guide ─────────────────────────── */
+h1, h2, h3 {
+  font-family:
+    "Noto Serif SC", "Source Han Serif SC", "思源宋体", "Songti SC",
+    "STSong", Georgia, serif;
+}
+
 .app-shell {
   display: grid;
   grid-template-rows: 76px minmax(0, 1fr) 32px;
   height: 100%;
   background:
-    radial-gradient(circle at 24% 10%, rgba(255, 255, 255, 0.85), transparent 28%),
-    linear-gradient(180deg, #f7fbff 0%, #edf3f9 100%);
+    radial-gradient(circle at 22% 8%, rgba(255, 253, 245, 0.75), transparent 26%),
+    linear-gradient(180deg, #f8f5ee 0%, #f0ece2 100%);
 }
 
 .topbar {
@@ -54,11 +65,11 @@ button {
   align-items: center;
   gap: 12px;
   padding: 0 24px;
-  color: white;
+  color: #e8e4d8;
   background:
-    linear-gradient(90deg, rgba(12, 77, 153, 0.95), rgba(7, 61, 130, 0.98)),
-    repeating-linear-gradient(45deg, transparent 0 12px, rgba(255, 255, 255, 0.04) 12px 13px);
-  box-shadow: 0 10px 30px rgba(5, 32, 73, 0.25);
+    linear-gradient(90deg, rgba(78, 70, 60, 0.99), rgba(78, 70, 60, 0.99)),
+    repeating-linear-gradient(45deg, transparent 0 12px, rgba(255, 255, 255, 0.025) 12px 13px);
+  box-shadow: 0 8px 28px rgba(30, 36, 14, 0.22);
 }
 
 .brand {
@@ -70,22 +81,26 @@ button {
 
 .brand h1 {
   margin: 0;
-  font-size: 28px;
-  font-weight: 800;
-  letter-spacing: 0;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: #f0ece2;
 }
 
 .brand p {
-  margin: 2px 0 0;
-  color: rgba(255, 255, 255, 0.72);
+  margin: 3px 0 0;
+  color: rgba(232, 228, 216, 0.58);
   font-size: 12px;
+  font-family:
+    "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
+  letter-spacing: 0.02em;
 }
 
 .brand-mark {
   position: relative;
   width: 70px;
   height: 46px;
-  color: white;
+  color: #a8b880;
 }
 
 .brand-mark::before,
@@ -102,7 +117,7 @@ button {
   right: 2px;
   top: 24px;
   height: 4px;
-  box-shadow: 0 9px 0 rgba(255, 255, 255, 0.85);
+  box-shadow: 0 9px 0 rgba(168, 184, 128, 0.7);
 }
 
 .brand-mark::after {
@@ -110,7 +125,7 @@ button {
   top: 4px;
   width: 4px;
   height: 38px;
-  box-shadow: 48px 0 0 white;
+  box-shadow: 48px 0 0 #a8b880;
 }
 
 .brand-mark span:first-child {
@@ -145,22 +160,30 @@ button {
   gap: 8px;
   min-width: 118px;
   padding: 0 14px;
-  color: rgba(255, 255, 255, 0.82);
+  color: rgba(232, 228, 216, 0.72);
   background: transparent;
-  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
   cursor: pointer;
+  transition: background 0.15s, color 0.15s;
 }
 
 .nav-item span {
   white-space: nowrap;
-  font-size: 15px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 600;
+  font-family:
+    "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
 }
 
 .nav-item.active {
-  background: linear-gradient(180deg, rgba(72, 141, 220, 0.9), rgba(36, 103, 187, 0.85));
-  color: white;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  background: rgba(141, 155, 110, 0.82);
+  color: #f0ece2;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.nav-item:not(.active):hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(232, 228, 216, 0.92);
 }
 
 .top-actions {
@@ -174,17 +197,18 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   border-radius: 8px;
   color: currentColor;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.07);
   cursor: pointer;
+  transition: background 0.15s;
 }
 
 .icon-action:hover,
 .small-icon-button:hover {
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.14);
 }
 
 .workspace {
@@ -197,7 +221,7 @@ button {
 
 .app-shell.immersive {
   grid-template-rows: minmax(0, 1fr);
-  background: #f8fbff;
+  background: #f5f2ea;
 }
 
 .app-shell.immersive .topbar,
@@ -231,7 +255,7 @@ button {
   top: 16px;
   bottom: 16px;
   z-index: 20;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(252, 250, 244, 0.94);
 }
 
 .app-shell.immersive .left-panel {
@@ -260,29 +284,31 @@ button {
   min-width: 170px;
   height: 44px;
   padding: 0 18px;
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.24);
+  color: #f0ece2;
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 999px;
-  background: linear-gradient(180deg, #1f76d2, #0d56a7);
-  box-shadow: 0 18px 36px rgba(12, 69, 132, 0.28);
+  background: linear-gradient(180deg, #8d9b6e, #6f7c33);
+  box-shadow: 0 16px 32px rgba(50, 60, 20, 0.24);
   cursor: pointer;
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 600;
+  font-family: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
   transform: translateX(-50%);
+  transition: background 0.15s;
 }
 
 .close-immersive-button:hover {
-  background: linear-gradient(180deg, #2d84df, #0f61bb);
+  background: linear-gradient(180deg, #9dab7e, #7f8c43);
 }
 
 .panel {
   min-height: 0;
   overflow: hidden;
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: var(--radius-panel);
   background: var(--panel);
   box-shadow: var(--shadow);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(12px);
 }
 
 .left-panel,
@@ -304,23 +330,24 @@ button {
 .panel-heading h2,
 .viewer-title h2 {
   margin: 0;
-  color: #103b75;
-  font-size: 18px;
-  font-weight: 800;
-  letter-spacing: 0;
+  color: #363d1f;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
 }
 
 .panel-heading p,
 .viewer-title p {
-  margin: 6px 0 0;
+  margin: 5px 0 0;
   color: var(--muted);
-  font-size: 13px;
-  line-height: 1.5;
+  font-size: 12.5px;
+  line-height: 1.55;
+  font-family: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
 }
 
 .left-panel .small-icon-button {
-  color: #496783;
-  background: #f4f8fc;
+  color: #6a6050;
+  background: #ece7dc;
   border: 1px solid var(--border);
 }
 
@@ -332,7 +359,7 @@ button {
 
 .component-group {
   padding: 6px 0 12px;
-  border-bottom: 1px solid #e3ebf3;
+  border-bottom: 1px solid #e4ddd4;
 }
 
 .component-group:last-child {
@@ -344,27 +371,28 @@ button {
   align-items: center;
   gap: 8px;
   margin: 6px 0 8px;
-  color: #1c477a;
-  font-size: 14px;
-  font-weight: 800;
+  color: #4a5228;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 .group-caret {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 2px;
 }
 
 .group-caret.superstructure {
-  background: #1f76d2;
+  background: #8d9b6e;
 }
 
 .group-caret.substructure {
-  background: #2f8f72;
+  background: #7a9080;
 }
 
 .group-caret.foundation {
-  background: #e69a32;
+  background: #b8894a;
 }
 
 .component-row {
@@ -373,12 +401,13 @@ button {
   gap: 10px;
   width: 100%;
   min-height: 42px;
-  padding: 7px 11px;
-  color: #244765;
+  padding: 7px 10px;
+  color: #4e463c;
   background: transparent;
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   cursor: pointer;
   text-align: left;
+  transition: background 0.12s;
 }
 
 .component-nav-icon {
@@ -415,8 +444,9 @@ button {
 }
 
 .component-row span:last-child {
-  font-size: 15px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
 }
 
 .component-row:hover {
@@ -425,7 +455,7 @@ button {
 
 .component-row.active {
   color: var(--component-accent-strong);
-  background: linear-gradient(90deg, var(--component-selected), rgba(255, 255, 255, 0.34));
+  background: linear-gradient(90deg, var(--component-selected), rgba(255, 255, 255, 0.15));
   box-shadow: inset 3px 0 0 var(--component-accent);
 }
 
@@ -436,25 +466,26 @@ button {
   justify-content: center;
   flex: 0 0 auto;
   color: white;
-  background: var(--blue-700);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  background: var(--sage-700);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 
 .component-number {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: var(--component-accent, var(--blue-700));
-  font-size: 13px;
-  font-weight: 800;
+  background: var(--component-accent, var(--sage-700));
+  font-size: 12px;
+  font-weight: 700;
+  font-family: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
 }
 
 .teaching-tip {
   margin-top: auto;
-  padding: 18px;
-  border: 1px solid #dce8f4;
-  border-radius: 12px;
-  background: linear-gradient(180deg, #f9fcff, #eef6ff);
+  padding: 16px;
+  border: 1px solid #ddd8ce;
+  border-radius: var(--radius-card);
+  background: linear-gradient(160deg, #f8f5ee, #ede8de);
 }
 
 .tip-topline {
@@ -468,11 +499,11 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
-  color: var(--blue-700);
+  width: 36px;
+  height: 36px;
+  color: var(--sage-700);
   border-radius: 10px;
-  background: #e5f0ff;
+  background: #dce6c4;
 }
 
 .tip-actions {
@@ -485,11 +516,12 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #45647f;
-  border: 1px solid #d7e4ef;
+  color: #6a6050;
+  border: 1px solid #d4cec4;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.82);
+  background: rgba(255, 255, 255, 0.65);
   cursor: pointer;
+  transition: background 0.12s, color 0.12s;
 }
 
 .tip-actions button {
@@ -499,31 +531,34 @@ button {
 
 .tip-actions button:hover,
 .tip-reopen:hover {
-  color: var(--blue-700);
-  background: #eef6ff;
+  color: var(--sage-700);
+  background: #e4edcc;
 }
 
 .tip-reopen {
   gap: 8px;
   width: 100%;
-  min-height: 48px;
+  min-height: 46px;
   margin-top: auto;
   padding: 0 14px;
-  font-size: 14px;
-  font-weight: 800;
+  font-size: 13.5px;
+  font-weight: 600;
+  font-family: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
 }
 
 .teaching-tip h3 {
-  margin: 12px 0 8px;
-  color: #0f4c98;
-  font-size: 17px;
+  margin: 10px 0 7px;
+  color: #363d1f;
+  font-size: 15px;
+  font-weight: 600;
 }
 
 .teaching-tip p {
   margin: 0;
-  color: #496783;
+  color: #6a6050;
   font-size: 13px;
-  line-height: 1.7;
+  line-height: 1.75;
+  font-family: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
 }
 
 .viewer-stage {
@@ -531,12 +566,12 @@ button {
   min-width: 0;
   min-height: 0;
   overflow: hidden;
-  border: 1px solid #d9e5f1;
-  border-radius: 14px;
+  border: 1px solid #d7d1c6;
+  border-radius: var(--radius-panel);
   background:
-    linear-gradient(rgba(41, 89, 145, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(41, 89, 145, 0.035) 1px, transparent 1px),
-    #f8fbff;
+    linear-gradient(rgba(80, 75, 55, 0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(80, 75, 55, 0.022) 1px, transparent 1px),
+    #f5f2ea;
   background-size: 24px 24px;
   box-shadow: var(--shadow);
 }
@@ -557,26 +592,28 @@ button {
 .mode-switch {
   display: flex;
   overflow: hidden;
-  border: 1px solid #cddceb;
+  border: 1px solid #cec8bc;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.86);
-  box-shadow: 0 8px 22px rgba(34, 74, 122, 0.12);
+  background: rgba(252, 250, 244, 0.92);
+  box-shadow: var(--shadow-sm);
   pointer-events: auto;
 }
 
 .mode-switch button {
-  width: 64px;
-  height: 42px;
-  color: #28445d;
+  width: 60px;
+  height: 40px;
+  color: #4e463c;
   background: transparent;
   cursor: pointer;
-  font-size: 16px;
-  font-weight: 800;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
+  transition: background 0.15s, color 0.15s;
 }
 
 .mode-switch button.active {
-  color: white;
-  background: linear-gradient(180deg, #2877d4, #0f5cac);
+  color: #f0ece2;
+  background: linear-gradient(180deg, #8d9b6e, #6f7c33);
 }
 
 .bridge-canvas,
@@ -588,34 +625,37 @@ button {
 .scene-label {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
   min-width: 72px;
-  padding: 6px 10px 6px 6px;
-  color: #134b8b;
+  padding: 5px 10px 5px 5px;
+  color: #363d1f;
   white-space: nowrap;
-  border: 1px solid rgba(25, 118, 210, 0.32);
+  border: 1px solid rgba(111, 124, 51, 0.28);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 8px 18px rgba(13, 55, 104, 0.18);
+  background: rgba(252, 250, 244, 0.95);
+  box-shadow: var(--shadow-sm);
   cursor: pointer;
-  font-size: 13px;
-  font-weight: 800;
+  font-size: 12.5px;
+  font-weight: 600;
+  font-family: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
 }
 
 .scene-label span {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 25px;
-  height: 25px;
+  width: 24px;
+  height: 24px;
   color: white;
   border-radius: 50%;
-  background: #155fb7;
+  background: #6f7c33;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .scene-label.active {
-  color: white;
-  background: #0f61bb;
+  color: #f0ece2;
+  background: #6f7c33;
 }
 
 .floating-legend {
@@ -625,43 +665,45 @@ button {
   bottom: 96px;
   width: 292px;
   padding: 14px 16px;
-  border: 1px solid #d7e4f0;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 16px 34px rgba(30, 73, 126, 0.14);
+  border: 1px solid #d4cec4;
+  border-radius: var(--radius-card);
+  background: rgba(252, 250, 244, 0.94);
+  box-shadow: var(--shadow);
 }
 
 .floating-legend h3 {
   margin: 0 0 10px;
-  color: #0f4c98;
-  font-size: 14px;
+  color: #363d1f;
+  font-size: 13.5px;
+  font-weight: 600;
 }
 
 .floating-legend div {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #486276;
+  color: #6a6050;
   font-size: 13px;
-  line-height: 1.9;
+  line-height: 2;
+  font-family: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
 }
 
 .legend-dot {
-  width: 10px;
-  height: 10px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
 }
 
 .legend-dot.superstructure {
-  background: #1f76d2;
+  background: #8d9b6e;
 }
 
 .legend-dot.substructure {
-  background: #2f8f72;
+  background: #7a9080;
 }
 
 .legend-dot.foundation {
-  background: #e69a32;
+  background: #b8894a;
 }
 
 .load-path-callout {
@@ -671,30 +713,37 @@ button {
   bottom: 102px;
   width: 308px;
   padding: 16px;
-  border: 1px solid rgba(230, 154, 50, 0.32);
-  border-radius: 12px;
-  background: rgba(255, 251, 242, 0.94);
-  box-shadow: 0 18px 34px rgba(117, 76, 20, 0.18);
+  border: 1px solid rgba(184, 137, 74, 0.28);
+  border-radius: var(--radius-card);
+  background: rgba(255, 249, 238, 0.97);
+  box-shadow: var(--shadow);
 }
 
 .load-path-callout span {
-  color: #b66d0b;
-  font-size: 12px;
-  font-weight: 800;
+  color: #a06010;
+  font-size: 11.5px;
+  font-weight: 700;
+  font-family: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .load-path-callout strong {
   display: block;
   margin-top: 5px;
-  color: #1c3b62;
+  color: #363d1f;
   font-size: 18px;
+  font-family:
+    "Noto Serif SC", "Source Han Serif SC", Georgia, serif;
+  font-weight: 600;
 }
 
 .load-path-callout p {
   margin: 6px 0 0;
-  color: #5a6270;
+  color: #6a6050;
   font-size: 13px;
-  line-height: 1.6;
+  line-height: 1.65;
+  font-family: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
 }
 
 .toolbar {
@@ -704,18 +753,19 @@ button {
   bottom: 14px;
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 9px;
+  gap: 4px;
+  padding: 8px;
   transform: translateX(-50%);
-  border: 1px solid #d4e0ec;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow: 0 20px 42px rgba(26, 63, 109, 0.18);
+  border: 1px solid #d4cec4;
+  border-radius: var(--radius-panel);
+  background: rgba(252, 250, 244, 0.97);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
 }
 
 .tool {
-  min-height: 58px;
-  border-right: 1px solid #dce5ee;
+  min-height: 56px;
+  border-right: 1px solid #ddd8d0;
 }
 
 .tool {
@@ -724,20 +774,26 @@ button {
   align-items: center;
   justify-content: center;
   gap: 5px;
-  min-width: 84px;
+  min-width: 82px;
   padding: 6px 12px;
-  color: #36516e;
+  color: #5a5246;
   background: transparent;
-  border-radius: 9px;
+  border-radius: 10px;
   cursor: pointer;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 500;
+  font-family: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
+  transition: background 0.12s, color 0.12s;
 }
 
-.tool:hover,
+.tool:hover {
+  color: var(--sage-700);
+  background: #edf2de;
+}
+
 .tool.active {
-  color: var(--blue-700);
-  background: #eef6ff;
+  color: #f0ece2;
+  background: linear-gradient(160deg, #8d9b6e, #6f7c33);
 }
 
 .toolbar .tool:last-child {
@@ -748,53 +804,58 @@ button {
   display: flex;
   align-items: center;
   gap: 14px;
-  margin-top: 22px;
+  margin-top: 20px;
 }
 
 .detail-number {
-  width: 46px;
-  height: 46px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  font-size: 26px;
-  font-weight: 900;
+  font-size: 24px;
+  font-weight: 800;
+  font-family: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
 }
 
 .detail-number.substructure {
-  background: #23876c;
+  background: #7a9080;
 }
 
 .detail-number.foundation {
-  background: #db8b24;
+  background: #b8894a;
 }
 
 .component-detail-title h2 {
   margin: 0;
-  color: #132d4f;
-  font-size: 31px;
+  color: #363d1f;
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
 }
 
 .component-detail-title p {
-  margin: 3px 0 0;
+  margin: 4px 0 0;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 12.5px;
+  font-family: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
 }
 
 .detail-summary {
-  margin: 18px 0;
-  color: #3a4d63;
-  font-size: 15px;
+  margin: 16px 0;
+  color: #4e463c;
+  font-size: 14px;
   line-height: 1.8;
+  font-family: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
 }
 
 .mini-diagram {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 204px;
-  margin-bottom: 18px;
-  border: 1px solid #d5e1ec;
-  border-radius: 10px;
-  background: #f8fbff;
+  height: 196px;
+  margin-bottom: 16px;
+  border: 1px solid #d4cec4;
+  border-radius: var(--radius-card);
+  background: #f5f2ea;
 }
 
 .mini-diagram svg {
@@ -804,25 +865,25 @@ button {
 
 .mini-diagram .diagram-shape,
 .mini-diagram .diagram-muted {
-  fill: #eef2f5;
-  stroke: #263a52;
+  fill: #e8e2d4;
+  stroke: #4e463c;
   stroke-width: 1.5;
 }
 
 .mini-diagram .diagram-muted {
-  fill: #eef2f5;
-  stroke: #8795a4;
+  fill: #e2dcd0;
+  stroke: #9a9084;
   opacity: 0.75;
 }
 
 .mini-diagram .diagram-highlight {
-  fill: rgba(40, 119, 212, 0.56);
-  stroke: #0f61bb;
+  fill: rgba(141, 155, 110, 0.48);
+  stroke: #6f7c33;
   stroke-width: 2.5;
 }
 
 .mini-diagram .diagram-highlight.secondary {
-  fill: rgba(40, 119, 212, 0.28);
+  fill: rgba(141, 155, 110, 0.22);
 }
 
 .mini-diagram .diagram-highlight.thin {
@@ -831,20 +892,20 @@ button {
 
 .mini-diagram .diagram-highlight.ground,
 .mini-diagram .diagram-fill-soil {
-  fill: rgba(230, 154, 50, 0.45);
-  stroke: #b56d12;
+  fill: rgba(184, 137, 74, 0.38);
+  stroke: #9a6820;
   stroke-width: 2;
 }
 
 .mini-diagram .diagram-axis {
-  stroke: #2d83d7;
+  stroke: #8d9b6e;
   stroke-dasharray: 6 5;
   stroke-width: 1.4;
 }
 
 .mini-diagram .diagram-arrow {
   fill: none;
-  stroke: #0f61bb;
+  stroke: #6f7c33;
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 2.2;
@@ -852,22 +913,22 @@ button {
 }
 
 .mini-diagram .diagram-caption {
-  fill: #174c8f;
+  fill: #363d1f;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .detail-table {
   overflow: hidden;
-  border: 1px solid #d8e4ef;
-  border-radius: 10px;
+  border: 1px solid #d4cec4;
+  border-radius: var(--radius-card);
 }
 
 .detail-row {
   display: grid;
-  grid-template-columns: 86px 1fr;
-  min-height: 54px;
-  border-bottom: 1px solid #e4ecf4;
+  grid-template-columns: 78px 1fr;
+  min-height: 52px;
+  border-bottom: 1px solid #ddd8d0;
 }
 
 .detail-row:last-child {
@@ -878,52 +939,67 @@ button {
   display: flex;
   align-items: center;
   padding: 12px;
-  color: #174c8f;
-  background: #edf5ff;
-  font-size: 14px;
+  color: #4a5228;
+  background: #ece7dc;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
 }
 
 .detail-row span {
   display: flex;
   align-items: center;
   padding: 12px 14px;
-  color: #3b4c61;
+  color: #4e463c;
   font-size: 13px;
-  line-height: 1.6;
+  line-height: 1.65;
+  font-family: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
 }
 
+/* ── Buttons ──────────────────────────────────────────────────── */
 .primary-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 9px;
   width: 100%;
-  height: 48px;
+  height: 46px;
   margin-top: auto;
-  color: white;
-  border-radius: 9px;
-  background: linear-gradient(180deg, #1774d6, #075bb0);
-  box-shadow: 0 12px 24px rgba(10, 89, 177, 0.25);
+  color: #f0ece2;
+  border-radius: var(--radius-btn);
+  background: linear-gradient(180deg, #8d9b6e, #6f7c33);
+  box-shadow: 0 8px 20px rgba(80, 95, 40, 0.2);
   cursor: pointer;
-  font-size: 15px;
-  font-weight: 800;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
+  letter-spacing: 0.02em;
+  transition: background 0.15s, box-shadow 0.15s;
 }
 
+.primary-button:hover {
+  background: linear-gradient(180deg, #9dab7e, #7f8c43);
+  box-shadow: 0 10px 24px rgba(80, 95, 40, 0.26);
+}
+
+/* ── Status bar ───────────────────────────────────────────────── */
 .statusbar {
   display: flex;
   align-items: center;
   gap: 22px;
   padding: 0 22px;
-  color: #526b86;
-  background: rgba(255, 255, 255, 0.74);
-  border-top: 1px solid #dbe5f0;
-  font-size: 13px;
+  color: #a9a397;
+  background: rgba(252, 250, 244, 0.82);
+  border-top: 1px solid #ddd8d0;
+  font-size: 12.5px;
+  font-family: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
 }
 
 .statusbar span:last-child {
   margin-left: auto;
 }
 
+/* ── 2D Diagram ───────────────────────────────────────────────── */
 .diagram-2d {
   display: flex;
   flex-direction: column;
@@ -946,22 +1022,24 @@ button {
   display: flex;
   overflow: hidden;
   transform: translateX(-50%);
-  border: 1px solid #cddceb;
+  border: 1px solid #cec8bc;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 10px 24px rgba(34, 74, 122, 0.12);
+  background: rgba(252, 250, 244, 0.94);
+  box-shadow: var(--shadow-sm);
 }
 
 .diagram-tabs button {
-  min-width: 104px;
-  height: 38px;
+  min-width: 100px;
+  height: 36px;
   padding: 0 14px;
-  color: #2c4b68;
+  color: #4e463c;
   background: transparent;
-  border-right: 1px solid #d9e4ef;
+  border-right: 1px solid #d4cec4;
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 800;
+  font-size: 13.5px;
+  font-weight: 600;
+  font-family: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
+  transition: background 0.15s, color 0.15s;
 }
 
 .diagram-tabs button:last-child {
@@ -969,49 +1047,49 @@ button {
 }
 
 .diagram-tabs button.active {
-  color: white;
-  background: linear-gradient(180deg, #2877d4, #0f5cac);
+  color: #f0ece2;
+  background: linear-gradient(180deg, #8d9b6e, #6f7c33);
 }
 
 .diagram-bg {
-  fill: rgba(255, 255, 255, 0.9);
-  stroke: #d7e4ef;
+  fill: rgba(252, 250, 244, 0.94);
+  stroke: #d4cec4;
 }
 
 .diagram-grid {
   fill: url("#diagramGrid");
-  opacity: 0.82;
+  opacity: 0.8;
 }
 
 .diagram-title {
-  fill: #103b75;
+  fill: #363d1f;
   font-size: 26px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .diagram-subtitle,
 .diagram-label-text {
-  fill: #506782;
-  font-size: 16px;
-  font-weight: 700;
+  fill: #6a6050;
+  font-size: 15px;
+  font-weight: 500;
 }
 
 .diagram-label-number {
   fill: white;
-  font-size: 13px;
-  font-weight: 900;
+  font-size: 12px;
+  font-weight: 800;
 }
 
 .diagram-panel-label {
-  fill: #0f61bb;
-  stroke: #0d56a7;
+  fill: #6f7c33;
+  stroke: #4a5228;
   stroke-width: 1;
 }
 
 .diagram-panel-label-text {
   fill: white;
-  font-size: 15px;
-  font-weight: 900;
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .diagram-callout {
@@ -1019,88 +1097,88 @@ button {
 }
 
 .diagram-callout line {
-  stroke: #1f76d2;
-  stroke-width: 2;
+  stroke: #8d9b6e;
+  stroke-width: 1.8;
 }
 
 .diagram-callout circle {
-  fill: #0f61bb;
+  fill: #6f7c33;
   stroke: white;
   stroke-width: 2;
 }
 
 .diagram-label-dot.superstructure {
-  fill: #1f76d2;
+  fill: #8d9b6e;
 }
 
 .diagram-label-dot.substructure {
-  fill: #2f8f72;
+  fill: #7a9080;
 }
 
 .diagram-label-dot.foundation {
-  fill: #e69a32;
+  fill: #b8894a;
 }
 
 .diagram-shape {
   cursor: pointer;
-  stroke: #5d6f80;
-  stroke-width: 2;
+  stroke: #6a6050;
+  stroke-width: 1.8;
   stroke-linejoin: round;
 }
 
 .diagram-shape.deck {
-  fill: #d6dce3;
+  fill: #c8c2b2;
 }
 
 .diagram-shape.girder,
 .diagram-shape.beam {
-  fill: #9ba9b6;
+  fill: #8a9870;
 }
 
 .diagram-shape.rail {
-  fill: #edf2f7;
+  fill: #e8e4d8;
 }
 
 .diagram-shape.bearing {
-  fill: #303945;
+  fill: #3a3428;
 }
 
 .diagram-shape.concrete {
-  fill: #d4d9df;
+  fill: #c4beb0;
 }
 
 .diagram-shape.cap {
-  fill: #c8cfd7;
+  fill: #bab4a6;
 }
 
 .diagram-shape.pile {
-  fill: #cbd3dc;
+  fill: #c0bab0;
 }
 
 .diagram-shape.soil {
-  fill: #b98555;
+  fill: #b08050;
 }
 
 .diagram-shape.selected {
-  stroke: #0a5eb9;
-  stroke-width: 4;
+  stroke: #6f7c33;
+  stroke-width: 3.5;
 }
 
 .diagram-shape.selected.superstructure {
-  fill: rgba(31, 118, 210, 0.66);
+  fill: rgba(141, 155, 110, 0.58);
 }
 
 .diagram-shape.selected.substructure {
-  fill: rgba(47, 143, 114, 0.66);
+  fill: rgba(122, 144, 128, 0.58);
 }
 
 .diagram-shape.selected.foundation {
-  fill: rgba(230, 154, 50, 0.66);
+  fill: rgba(184, 137, 74, 0.58);
 }
 
 .road-mark {
   fill: none;
-  stroke: white;
+  stroke: rgba(255, 255, 255, 0.65);
   stroke-dasharray: 0;
   stroke-linecap: round;
   stroke-width: 4;
@@ -1120,7 +1198,7 @@ button {
   }
 
   .brand h1 {
-    font-size: 22px;
+    font-size: 20px;
   }
 
   .brand-mark {
@@ -1129,11 +1207,11 @@ button {
   }
 
   .nav-item {
-    min-width: 102px;
+    min-width: 100px;
     padding: 0 10px;
   }
 
   .tool {
-    min-width: 72px;
+    min-width: 70px;
   }
 }
