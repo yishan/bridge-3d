@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { ContactShadows, Html, OrbitControls } from "@react-three/drei";
 import {
@@ -7,6 +8,7 @@ import {
   loadPathComponentIds,
   type BridgeCategory
 } from "../lib/bridgeData";
+import { twoDViewModes, type TwoDViewMode } from "../lib/viewConfig";
 import { useViewerStore } from "../store/viewerStore";
 
 type Vec3 = [number, number, number];
@@ -338,158 +340,247 @@ function GridFloor() {
 }
 
 function BridgeDiagram2D() {
+  const [activeView, setActiveView] = useState<TwoDViewMode>("top");
   const selectedId = useViewerStore((state) => state.selectedComponentId);
   const selectComponent = useViewerStore((state) => state.selectComponent);
   const selected = getComponentById(selectedId);
 
   return (
     <div className="diagram-2d">
-      <svg viewBox="0 0 900 520" role="img" aria-label="桥梁二维结构示意图">
+      <div className="diagram-tabs" aria-label="2D视图切换">
+        {twoDViewModes.map((mode) => (
+          <button
+            className={activeView === mode.id ? "active" : ""}
+            key={mode.id}
+            onClick={() => setActiveView(mode.id)}
+            type="button"
+          >
+            {mode.label}
+          </button>
+        ))}
+      </div>
+      <svg viewBox="0 0 900 520" role="img" aria-label={`${getTwoDModeLabel(activeView)}桥梁二维结构示意图`}>
         <defs>
           <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
             <feDropShadow dx="0" dy="10" floodColor="#0d3768" floodOpacity="0.14" stdDeviation="10" />
           </filter>
+          <pattern id="diagramGrid" width="24" height="24" patternUnits="userSpaceOnUse">
+            <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#dfe8f2" strokeWidth="1" />
+          </pattern>
         </defs>
         <rect className="diagram-bg" width="900" height="520" rx="24" />
-        <g filter="url(#softShadow)">
-          <rect
-            className={selectedId === "soil-layer" ? "diagram-shape selected foundation" : "diagram-shape soil"}
-            x="86"
-            y="384"
-            width="728"
-            height="58"
-            rx="8"
-            onClick={() => selectComponent("soil-layer")}
-          />
-          <rect
-            className={selectedId === "deck-slab" ? "diagram-shape selected superstructure" : "diagram-shape deck"}
-            x="158"
-            y="134"
-            width="584"
-            height="30"
-            rx="5"
-            onClick={() => selectComponent("deck-slab")}
-          />
-          <rect
-            className={selectedId === "main-girder" ? "diagram-shape selected superstructure" : "diagram-shape girder"}
-            x="188"
-            y="172"
-            width="524"
-            height="42"
-            rx="5"
-            onClick={() => selectComponent("main-girder")}
-          />
-          <rect
-            className={selectedId === "pier" ? "diagram-shape selected substructure" : "diagram-shape concrete"}
-            x="398"
-            y="228"
-            width="52"
-            height="118"
-            rx="6"
-            onClick={() => selectComponent("pier")}
-          />
-          <rect
-            className={selectedId === "pier" ? "diagram-shape selected substructure" : "diagram-shape concrete"}
-            x="502"
-            y="228"
-            width="52"
-            height="118"
-            rx="6"
-            onClick={() => selectComponent("pier")}
-          />
-          <rect
-            className={selectedId === "abutment" ? "diagram-shape selected substructure" : "diagram-shape concrete"}
-            x="118"
-            y="214"
-            width="54"
-            height="136"
-            rx="5"
-            onClick={() => selectComponent("abutment")}
-          />
-          <rect
-            className={selectedId === "abutment" ? "diagram-shape selected substructure" : "diagram-shape concrete"}
-            x="728"
-            y="214"
-            width="54"
-            height="136"
-            rx="5"
-            onClick={() => selectComponent("abutment")}
-          />
-          <rect
-            className={selectedId === "pile-cap" ? "diagram-shape selected foundation" : "diagram-shape cap"}
-            x="368"
-            y="346"
-            width="218"
-            height="34"
-            rx="6"
-            onClick={() => selectComponent("pile-cap")}
-          />
-          {[395, 435, 515, 555].map((x) => (
-            <rect
-              className={
-                selectedId === "pile-foundation"
-                  ? "diagram-shape selected foundation"
-                  : "diagram-shape pile"
-              }
-              height="78"
-              key={x}
-              onClick={() => selectComponent("pile-foundation")}
-              rx="8"
-              width="20"
-              x={x}
-              y="380"
-            />
-          ))}
-          <rect
-            className={selectedId === "guardrail" ? "diagram-shape selected superstructure" : "diagram-shape rail"}
-            x="162"
-            y="99"
-            width="576"
-            height="14"
-            rx="4"
-            onClick={() => selectComponent("guardrail")}
-          />
-          <rect
-            className={selectedId === "bearing" ? "diagram-shape selected superstructure" : "diagram-shape bearing"}
-            x="396"
-            y="214"
-            width="62"
-            height="14"
-            rx="4"
-            onClick={() => selectComponent("bearing")}
-          />
-          <rect
-            className={selectedId === "cross-beam" ? "diagram-shape selected superstructure" : "diagram-shape beam"}
-            x="444"
-            y="168"
-            width="20"
-            height="54"
-            rx="4"
-            onClick={() => selectComponent("cross-beam")}
-          />
-        </g>
+        <rect className="diagram-grid" width="900" height="520" rx="24" />
         <text className="diagram-title" x="42" y="62">
-          2D 构件关系示意
+          {getTwoDModeLabel(activeView)}
         </text>
         <text className="diagram-subtitle" x="42" y="92">
           当前选中: {selected?.nameZh ?? "主梁"}
         </text>
-        {bridgeComponents.slice(0, 9).map((component, index) => (
-          <g key={component.id} transform={`translate(${640}, ${52 + index * 34})`}>
-            <circle
-              className={`diagram-label-dot ${component.category}`}
-              r="12"
-              onClick={() => selectComponent(component.id)}
-            />
-            <text className="diagram-label-number" dy="5" textAnchor="middle">
-              {component.number}
-            </text>
-            <text className="diagram-label-text" x="24" y="5">
-              {component.nameZh}
-            </text>
-          </g>
-        ))}
+        {activeView === "top" ? (
+          <TopViewDiagram selectedId={selectedId} selectComponent={selectComponent} />
+        ) : null}
+        {activeView === "side" ? (
+          <SideViewDiagram selectedId={selectedId} selectComponent={selectComponent} />
+        ) : null}
       </svg>
     </div>
+  );
+}
+
+function getTwoDModeLabel(mode: TwoDViewMode) {
+  return twoDViewModes.find((item) => item.id === mode)?.label ?? "顶视图";
+}
+
+function shapeClass(selectedId: string, id: string, category: BridgeCategory, fallback: string) {
+  return selectedId === id ? `diagram-shape selected ${category}` : `diagram-shape ${fallback}`;
+}
+
+type DiagramViewProps = {
+  selectedId: string;
+  selectComponent: (id: string) => void;
+};
+
+function TopViewDiagram({ selectedId, selectComponent }: DiagramViewProps) {
+  return (
+    <g filter="url(#softShadow)">
+      <rect className="diagram-panel-label" x="40" y="126" width="72" height="32" rx="6" />
+      <text className="diagram-panel-label-text" x="76" y="148" textAnchor="middle">顶视图</text>
+      <rect
+        className={shapeClass(selectedId, "deck-slab", "superstructure", "deck")}
+        height="104"
+        onClick={() => selectComponent("deck-slab")}
+        rx="8"
+        width="560"
+        x="170"
+        y="210"
+      />
+      <rect
+        className={shapeClass(selectedId, "guardrail", "superstructure", "rail")}
+        height="10"
+        onClick={() => selectComponent("guardrail")}
+        rx="3"
+        width="580"
+        x="160"
+        y="190"
+      />
+      <rect
+        className={shapeClass(selectedId, "guardrail", "superstructure", "rail")}
+        height="10"
+        onClick={() => selectComponent("guardrail")}
+        rx="3"
+        width="580"
+        x="160"
+        y="324"
+      />
+      {[260, 450, 640].map((x) => (
+        <rect
+          className={shapeClass(selectedId, "cross-beam", "superstructure", "beam")}
+          height="104"
+          key={x}
+          onClick={() => selectComponent("cross-beam")}
+          rx="3"
+          width="12"
+          x={x}
+          y="210"
+        />
+      ))}
+      <path className="road-mark" d="M215 262h34M288 262h34M361 262h34M434 262h34M507 262h34M580 262h34M653 262h34" />
+      <DiagramCallout x={285} y={185} number={1} label="护栏" onClick={() => selectComponent("guardrail")} />
+      <DiagramCallout x={610} y={185} number={2} label="桥面板" onClick={() => selectComponent("deck-slab")} />
+      <DiagramCallout x={450} y={336} number={4} label="横梁" onClick={() => selectComponent("cross-beam")} />
+    </g>
+  );
+}
+
+function SideViewDiagram({ selectedId, selectComponent }: DiagramViewProps) {
+  return (
+    <g filter="url(#softShadow)">
+      <rect className="diagram-panel-label" x="40" y="126" width="72" height="32" rx="6" />
+      <text className="diagram-panel-label-text" x="76" y="148" textAnchor="middle">侧视图</text>
+      <path
+        className={shapeClass(selectedId, "soil-layer", "foundation", "soil")}
+        d="M90 350h720v82H90z"
+        onClick={() => selectComponent("soil-layer")}
+      />
+      <rect
+        className={shapeClass(selectedId, "deck-slab", "superstructure", "deck")}
+        height="22"
+        onClick={() => selectComponent("deck-slab")}
+        rx="4"
+        width="650"
+        x="125"
+        y="176"
+      />
+      <rect
+        className={shapeClass(selectedId, "guardrail", "superstructure", "rail")}
+        height="16"
+        onClick={() => selectComponent("guardrail")}
+        rx="3"
+        width="620"
+        x="140"
+        y="150"
+      />
+      <rect
+        className={shapeClass(selectedId, "main-girder", "superstructure", "girder")}
+        height="36"
+        onClick={() => selectComponent("main-girder")}
+        rx="4"
+        width="620"
+        x="140"
+        y="198"
+      />
+      {[218, 422, 626].map((x) => (
+        <g key={x}>
+          <rect
+            className={shapeClass(selectedId, "bearing", "superstructure", "bearing")}
+            height="12"
+            onClick={() => selectComponent("bearing")}
+            rx="3"
+            width="40"
+            x={x}
+            y="236"
+          />
+          <rect
+            className={shapeClass(selectedId, "pier", "substructure", "concrete")}
+            height="92"
+            onClick={() => selectComponent("pier")}
+            rx="4"
+            width="36"
+            x={x + 2}
+            y="248"
+          />
+          <rect
+            className={shapeClass(selectedId, "pile-cap", "foundation", "cap")}
+            height="24"
+            onClick={() => selectComponent("pile-cap")}
+            rx="4"
+            width="80"
+            x={x - 20}
+            y="340"
+          />
+          {[x - 6, x + 18, x + 42].map((pileX) => (
+            <rect
+              className={shapeClass(selectedId, "pile-foundation", "foundation", "pile")}
+              height="52"
+              key={pileX}
+              onClick={() => selectComponent("pile-foundation")}
+              rx="5"
+              width="14"
+              x={pileX}
+              y="364"
+            />
+          ))}
+        </g>
+      ))}
+      <path
+        className={shapeClass(selectedId, "abutment", "substructure", "concrete")}
+        d="M90 234h48v116H90zM762 234h48v116h-48z"
+        onClick={() => selectComponent("abutment")}
+      />
+      <rect
+        className={shapeClass(selectedId, "cross-beam", "superstructure", "beam")}
+        height="46"
+        onClick={() => selectComponent("cross-beam")}
+        rx="3"
+        width="10"
+        x="758"
+        y="192"
+      />
+      <DiagramCallout x={310} y={138} number={1} label="护栏" onClick={() => selectComponent("guardrail")} />
+      <DiagramCallout x={480} y={142} number={2} label="桥面板" onClick={() => selectComponent("deck-slab")} />
+      <DiagramCallout x={460} y={256} number={3} label="主梁" onClick={() => selectComponent("main-girder")} />
+      <DiagramCallout x={790} y={246} number={4} label="横梁" onClick={() => selectComponent("cross-beam")} />
+      <DiagramCallout x={690} y={276} number={5} label="支座" onClick={() => selectComponent("bearing")} />
+      <DiagramCallout x={650} y={324} number={6} label="桥墩" onClick={() => selectComponent("pier")} />
+      <DiagramCallout x={160} y={336} number={7} label="桥台" onClick={() => selectComponent("abutment")} />
+      <DiagramCallout x={520} y={424} number={8} label="基础" onClick={() => selectComponent("pile-cap")} />
+    </g>
+  );
+}
+
+function DiagramCallout({
+  x,
+  y,
+  number,
+  label,
+  onClick
+}: {
+  x: number;
+  y: number;
+  number: number;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <g className="diagram-callout" onClick={onClick} transform={`translate(${x}, ${y})`}>
+      <line x1="0" x2="0" y1="0" y2="42" />
+      <circle r="13" />
+      <text className="diagram-label-number" dy="5" textAnchor="middle">
+        {number}
+      </text>
+      <text className="diagram-label-text" x="20" y="5">
+        {label}
+      </text>
+    </g>
   );
 }

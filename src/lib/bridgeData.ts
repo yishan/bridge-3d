@@ -10,6 +10,17 @@ export type DetailDiagramVariant =
   | "cap-block"
   | "deep-piles"
   | "ground-layer";
+export type NavIconVariant =
+  | "shield-rail"
+  | "deck-road"
+  | "girder"
+  | "cross-girder"
+  | "bearing-pad"
+  | "pier-column"
+  | "abutment-wall"
+  | "pile-cap"
+  | "pile-group"
+  | "soil-strata";
 
 export type BridgeComponent = {
   id: string;
@@ -24,6 +35,7 @@ export type BridgeComponent = {
   relatedComponentIds: string[];
   labelPosition: [number, number, number];
   diagramVariant: DetailDiagramVariant;
+  navIcon: NavIconVariant;
 };
 
 export const categoryLabels: Record<BridgeCategory, string> = {
@@ -80,7 +92,8 @@ export const bridgeComponents: BridgeComponent[] = [
     materials: ["钢材", "混凝土", "金属栏杆组合件"],
     relatedComponentIds: ["deck-slab", "main-girder"],
     labelPosition: [-4.55, 2.75, -1.45],
-    diagramVariant: "edge-safety"
+    diagramVariant: "edge-safety",
+    navIcon: "shield-rail"
   },
   {
     id: "deck-slab",
@@ -94,7 +107,8 @@ export const bridgeComponents: BridgeComponent[] = [
     materials: ["钢筋混凝土", "预应力混凝土", "钢桥面板"],
     relatedComponentIds: ["guardrail", "main-girder", "cross-beam"],
     labelPosition: [-0.35, 2.8, 0.1],
-    diagramVariant: "top-slab"
+    diagramVariant: "top-slab",
+    navIcon: "deck-road"
   },
   {
     id: "main-girder",
@@ -108,7 +122,8 @@ export const bridgeComponents: BridgeComponent[] = [
     materials: ["钢材", "预应力混凝土", "钢筋混凝土"],
     relatedComponentIds: ["deck-slab", "cross-beam", "bearing", "pier", "abutment"],
     labelPosition: [-0.9, 1.25, -1.3],
-    diagramVariant: "longitudinal-girder"
+    diagramVariant: "longitudinal-girder",
+    navIcon: "girder"
   },
   {
     id: "cross-beam",
@@ -122,7 +137,8 @@ export const bridgeComponents: BridgeComponent[] = [
     materials: ["钢材", "钢筋混凝土"],
     relatedComponentIds: ["main-girder", "deck-slab", "bearing"],
     labelPosition: [2.65, 1.6, 1.18],
-    diagramVariant: "transverse-beam"
+    diagramVariant: "transverse-beam",
+    navIcon: "cross-girder"
   },
   {
     id: "bearing",
@@ -136,7 +152,8 @@ export const bridgeComponents: BridgeComponent[] = [
     materials: ["橡胶支座", "钢支座", "盆式支座"],
     relatedComponentIds: ["main-girder", "pier", "abutment"],
     labelPosition: [3.55, 1.08, 1.2],
-    diagramVariant: "support-node"
+    diagramVariant: "support-node",
+    navIcon: "bearing-pad"
   },
   {
     id: "pier",
@@ -150,7 +167,8 @@ export const bridgeComponents: BridgeComponent[] = [
     materials: ["钢筋混凝土", "预应力混凝土"],
     relatedComponentIds: ["bearing", "pile-cap", "pile-foundation"],
     labelPosition: [1.95, 0.48, 1.35],
-    diagramVariant: "vertical-pier"
+    diagramVariant: "vertical-pier",
+    navIcon: "pier-column"
   },
   {
     id: "abutment",
@@ -164,7 +182,8 @@ export const bridgeComponents: BridgeComponent[] = [
     materials: ["钢筋混凝土", "片石混凝土"],
     relatedComponentIds: ["main-girder", "bearing", "pile-cap"],
     labelPosition: [-5.15, 0.55, 1.28],
-    diagramVariant: "end-abutment"
+    diagramVariant: "end-abutment",
+    navIcon: "abutment-wall"
   },
   {
     id: "pile-cap",
@@ -178,7 +197,8 @@ export const bridgeComponents: BridgeComponent[] = [
     materials: ["钢筋混凝土"],
     relatedComponentIds: ["pier", "abutment", "pile-foundation"],
     labelPosition: [2.35, -0.38, 1.45],
-    diagramVariant: "cap-block"
+    diagramVariant: "cap-block",
+    navIcon: "pile-cap"
   },
   {
     id: "pile-foundation",
@@ -192,7 +212,8 @@ export const bridgeComponents: BridgeComponent[] = [
     materials: ["钢筋混凝土灌注桩", "预制混凝土桩", "钢管桩"],
     relatedComponentIds: ["pile-cap", "soil-layer"],
     labelPosition: [3.05, -1.2, 1.35],
-    diagramVariant: "deep-piles"
+    diagramVariant: "deep-piles",
+    navIcon: "pile-group"
   },
   {
     id: "soil-layer",
@@ -206,7 +227,8 @@ export const bridgeComponents: BridgeComponent[] = [
     materials: ["天然土层", "加固土层", "岩层"],
     relatedComponentIds: ["pile-foundation", "pile-cap"],
     labelPosition: [-4.35, -1.18, 1.38],
-    diagramVariant: "ground-layer"
+    diagramVariant: "ground-layer",
+    navIcon: "soil-strata"
   }
 ];
 

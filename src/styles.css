@@ -370,7 +370,7 @@ button {
 .component-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
   min-height: 42px;
   padding: 7px 11px;
@@ -379,6 +379,39 @@ button {
   border-radius: 8px;
   cursor: pointer;
   text-align: left;
+}
+
+.component-nav-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 25px;
+  height: 25px;
+  color: var(--component-accent);
+}
+
+.component-nav-icon svg {
+  width: 24px;
+  height: 24px;
+  overflow: visible;
+}
+
+.component-nav-icon path,
+.component-nav-icon rect {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.component-nav-icon rect {
+  fill: rgba(255, 255, 255, 0.28);
+}
+
+.component-nav-icon .icon-dash {
+  stroke-dasharray: 2 2;
 }
 
 .component-row span:last-child {
@@ -491,24 +524,6 @@ button {
   color: #496783;
   font-size: 13px;
   line-height: 1.7;
-}
-
-.tip-dots {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 18px;
-}
-
-.tip-dots span {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: #cfdbe8;
-}
-
-.tip-dots span.active {
-  background: var(--blue-700);
 }
 
 .viewer-stage {
@@ -911,9 +926,11 @@ button {
 
 .diagram-2d {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 74px 36px 98px;
+  gap: 14px;
+  padding: 86px 36px 98px;
 }
 
 .diagram-2d svg {
@@ -921,9 +938,49 @@ button {
   max-height: 100%;
 }
 
+.diagram-tabs {
+  position: absolute;
+  z-index: 8;
+  top: 86px;
+  left: 50%;
+  display: flex;
+  overflow: hidden;
+  transform: translateX(-50%);
+  border: 1px solid #cddceb;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 24px rgba(34, 74, 122, 0.12);
+}
+
+.diagram-tabs button {
+  min-width: 104px;
+  height: 38px;
+  padding: 0 14px;
+  color: #2c4b68;
+  background: transparent;
+  border-right: 1px solid #d9e4ef;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.diagram-tabs button:last-child {
+  border-right: 0;
+}
+
+.diagram-tabs button.active {
+  color: white;
+  background: linear-gradient(180deg, #2877d4, #0f5cac);
+}
+
 .diagram-bg {
   fill: rgba(255, 255, 255, 0.9);
   stroke: #d7e4ef;
+}
+
+.diagram-grid {
+  fill: url("#diagramGrid");
+  opacity: 0.82;
 }
 
 .diagram-title {
@@ -945,6 +1002,33 @@ button {
   font-weight: 900;
 }
 
+.diagram-panel-label {
+  fill: #0f61bb;
+  stroke: #0d56a7;
+  stroke-width: 1;
+}
+
+.diagram-panel-label-text {
+  fill: white;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.diagram-callout {
+  cursor: pointer;
+}
+
+.diagram-callout line {
+  stroke: #1f76d2;
+  stroke-width: 2;
+}
+
+.diagram-callout circle {
+  fill: #0f61bb;
+  stroke: white;
+  stroke-width: 2;
+}
+
 .diagram-label-dot.superstructure {
   fill: #1f76d2;
 }
@@ -961,6 +1045,7 @@ button {
   cursor: pointer;
   stroke: #5d6f80;
   stroke-width: 2;
+  stroke-linejoin: round;
 }
 
 .diagram-shape.deck {
@@ -1011,6 +1096,14 @@ button {
 
 .diagram-shape.selected.foundation {
   fill: rgba(230, 154, 50, 0.66);
+}
+
+.road-mark {
+  fill: none;
+  stroke: white;
+  stroke-dasharray: 0;
+  stroke-linecap: round;
+  stroke-width: 4;
 }
 
 @media (max-width: 1280px) {

@@ -11,6 +11,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { BridgeViewer } from "./components/BridgeViewer";
+import { ComponentNavIcon } from "./components/ComponentNavIcon";
 import { DetailDiagram } from "./components/DetailDiagram";
 import {
   categoryLabels,
@@ -203,6 +204,7 @@ function ComponentNavigation({
               style={getComponentRowStyle(component.category)}
               type="button"
             >
+              <ComponentNavIcon component={component} />
               <span className={`component-number ${component.category}`}>
                 {component.number}
               </span>
@@ -241,11 +243,6 @@ function TeachingTip() {
       </div>
       <h3>使用提示</h3>
       <p>先从整体视图认识构件名称，再播放受力路径理解荷载如何逐级传递。</p>
-      <div className="tip-dots">
-        <span className="active" />
-        <span />
-        <span />
-      </div>
     </div>
   );
 }

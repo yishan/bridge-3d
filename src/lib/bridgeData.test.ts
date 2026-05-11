@@ -58,6 +58,21 @@ describe("bridge component teaching data", () => {
     ]);
   });
 
+  it("assigns one navigation icon variant to every component", () => {
+    expect(bridgeComponents.map((item) => [item.id, item.navIcon])).toEqual([
+      ["guardrail", "shield-rail"],
+      ["deck-slab", "deck-road"],
+      ["main-girder", "girder"],
+      ["cross-beam", "cross-girder"],
+      ["bearing", "bearing-pad"],
+      ["pier", "pier-column"],
+      ["abutment", "abutment-wall"],
+      ["pile-cap", "pile-cap"],
+      ["pile-foundation", "pile-group"],
+      ["soil-layer", "soil-strata"]
+    ]);
+  });
+
   it("provides matching navigation tones for each structure layer", () => {
     expect(categoryUiColors).toEqual({
       superstructure: {
