@@ -1,6 +1,7 @@
-import { useState } from "react";
-import { Canvas } from "@react-three/fiber";
+import { useMemo, useRef, useState } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
 import { ContactShadows, Html, OrbitControls } from "@react-three/drei";
+import * as THREE from "three";
 import {
   bridgeComponents,
   categoryColors,
@@ -267,6 +268,8 @@ function BridgeModel() {
         ))}
       </InteractiveGroup>
 
+      {loadPathActive ? <LoadPathParticles step={loadPathStep} /> : null}
+
       {labelsVisible
         ? bridgeComponents.map((component) => {
             const offset = decompositionEnabled ? categoryOffsets[component.category] : [0, 0, 0];
@@ -338,6 +341,99 @@ function GridFloor() {
     />
   );
 }
+
+// ─── 受力路径粒子流 ─────────────────────────────────────────────
+
+// 各构件的受力传递关键坐标点（从上到下）
+const LOAD_PATH_WAYPOINTS: [number, number, number][] = [
+  [0, 1.88, 0],       // 桥面板顶部（荷载作用点）
+  [0, 1.72, 0],       // 桥面板底部
+  [0, 1.28, 0],       // 主梁中心
+  [0, 1.24, 0],       // 横梁
+  [0, 0.98, 0],       // 支座
+  [0, 0.52, 0],       // 桥墩顶
+  [0, -0.1, 0],       // 桥墩底
+  [0, -0.58, 0],      // 承台
+  [0, -1.06, 0],      // 桩基
+  [0, -1.42, 0],      // 地基
+];
+
+const PARTICLE_COUNT = 48;
+const TRAIL_COUNT = 3;   // 左中右 3 条轨迹
+const TRAIL_Z = [-0.55, 0, 0.55];
+
+function LoadPathParticles({ step }: { step: number }) {
+  const pointsRef = useRef<THREE.Points>(null);
+
+  // 构建从起点到当前步骤终点的曲线
+  const { curve, totalPoints } = useMemo(() => {
+    // step 映射到 waypoint 索引：step 0~7 → waypoint 0~9
+    // 每步约 1.25 个 waypoint 间距，我们取到 step+2 确保覆盖
+    const endIdx = Math.min(step + 2, LOAD_PATH_WAYPOINTS.length - 1);
+    const pts = LOAD_PATH_WAYPOINTS.slice(0, endIdx + 1).map(
+      ([x, y, z]) => new THREE.Vector3(x, y, z)
+    );
+    return {
+      curve: new THREE.CatmullRomCurve3(pts, false, "catmullrom", 0.3),
+      totalPoints: PARTICLE_COUNT * TRAIL_COUNT
+    };
+  }, [step]);
+
+  // 初始化粒子 geometry
+  const geometry = useMemo(() => {
+    const geom = new THREE.BufferGeometry();
+    const positions = new Float32Array(totalPoints * 3);
+    const sizes = new Float32Array(totalPoints);
+    const opacities = new Float32Array(totalPoints);
+    geom.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    geom.setAttribute("size", new THREE.BufferAttribute(sizes, 1));
+    geom.setAttribute("opacity", new THREE.BufferAttribute(opacities, 1));
+    return geom;
+  }, [totalPoints]);
+
+  // 每帧更新粒子位置
+  useFrame(() => {
+    if (!pointsRef.current) return;
+    const positions = geometry.getAttribute("position") as THREE.BufferAttribute;
+    const opacities = geometry.getAttribute("opacity") as THREE.BufferAttribute;
+    const time = Date.now() * 0.0004;
+
+    for (let trail = 0; trail < TRAIL_COUNT; trail++) {
+      const zOff = TRAIL_Z[trail];
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        const idx = trail * PARTICLE_COUNT + i;
+        // 每个粒子有不同相位，形成连续流
+        const t = ((time + i / PARTICLE_COUNT) % 1);
+        const point = curve.getPointAt(t);
+
+        positions.setXYZ(idx, point.x + zOff, point.y, point.z);
+        // 头部亮，尾部暗
+        const fade = 1 - t;
+        opacities.setX(idx, fade * 0.85);
+      }
+    }
+    positions.needsUpdate = true;
+    opacities.needsUpdate = true;
+  });
+
+  const material = useMemo(
+    () =>
+      new THREE.PointsMaterial({
+        color: 0xffaa33,
+        size: 0.14,
+        transparent: true,
+        opacity: 0.9,
+        sizeAttenuation: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+      }),
+    []
+  );
+
+  return <points ref={pointsRef} geometry={geometry} material={material} />;
+}
+
+// ─── 2D 视图 ────────────────────────────────────────────────────
 
 function BridgeDiagram2D() {
   const [activeView, setActiveView] = useState<TwoDViewMode>("top");
