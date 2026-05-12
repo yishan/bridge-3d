@@ -1,11 +1,11 @@
 import { Suspense, useEffect, useId, useMemo, useRef, useState, type ChangeEvent } from "react";
-import { Canvas, useLoader, useThree } from "@react-three/fiber";
+import { Canvas, useLoader } from "@react-three/fiber";
 import { ContactShadows, OrbitControls } from "@react-three/drei";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter.js";
 import * as THREE from "three";
-import { AlertCircle, Box, ChevronDown, RotateCcw, Upload } from "lucide-react";
+import { AlertCircle, Box, ChevronDown, Palette, Upload } from "lucide-react";
 
 const DEFAULT_MODEL = { id: "bridge", name: "bridge.glb", src: "/models/bridge.glb" };
 
@@ -23,6 +23,28 @@ type ActiveModel = {
   source: string;
 };
 
+// ─── 结构分色：按 Y 坐标将顶点映射到不同构件颜色 ───────────────
+// bridge.glb 原始 Y 范围约 -0.204 ~ 0.208（总高 0.412）
+// 从下到上依次：地基/土层 → 桩基 → 承台 → 桥墩 → 支座 → 主梁/横梁 → 桥面板 → 护栏
+
+const STRUCTURE_BANDS: { maxY: number; color: [number, number, number]; label: string }[] = [
+  { maxY: -0.16, color: [0.68, 0.46, 0.20], label: "地基/土层" },     // 棕色
+  { maxY: -0.10, color: [0.55, 0.70, 0.55], label: "桩基" },          // 绿色
+  { maxY: -0.04, color: [0.40, 0.60, 0.75], label: "承台" },          // 蓝色
+  { maxY:  0.06, color: [0.75, 0.55, 0.35], label: "桥墩" },          // 橙色
+  { maxY:  0.08, color: [0.25, 0.25, 0.30], label: "支座" },          // 深灰
+  { maxY:  0.12, color: [0.85, 0.45, 0.40], label: "主梁/横梁" },     // 红色
+  { maxY:  0.17, color: [0.55, 0.65, 0.80], label: "桥面板" },        // 淡蓝
+  { maxY:  Infinity, color: [0.90, 0.85, 0.60], label: "护栏" },      // 黄色
+];
+
+function getStructureColor(y: number): [number, number, number] {
+  for (const band of STRUCTURE_BANDS) {
+    if (y <= band.maxY) return band.color;
+  }
+  return STRUCTURE_BANDS[STRUCTURE_BANDS.length - 1].color;
+}
+
 // ─── 主面板 ──────────────────────────────────────────────────────
 
 export function ModelViewerPanel() {
@@ -34,6 +56,7 @@ export function ModelViewerPanel() {
   });
   const [status, setStatus] = useState("正在载入模型...");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [structuralColor, setStructuralColor] = useState(false);
   const blobUrlsRef = useRef<string[]>([]);
 
   const track = (url: string) => {
@@ -117,7 +140,16 @@ export function ModelViewerPanel() {
             </select>
             <ChevronDown className="model-select-icon" size={16} />
           </div>
-          <label className="model-action" htmlFor={uploadInputId}>
+          <button
+            className={structuralColor ? "model-action" : "model-action secondary"}
+            onClick={() => setStructuralColor((v) => !v)}
+            type="button"
+            title="按结构分色"
+          >
+            <Palette size={18} />
+            分色
+          </button>
+          <label className="model-action secondary" htmlFor={uploadInputId}>
             <Upload size={18} />
             上传
           </label>
@@ -146,6 +178,7 @@ export function ModelViewerPanel() {
             <LoadedModel
               key={activeModel.src}
               src={activeModel.src}
+              structuralColor={structuralColor}
               onLoad={() => {
                 setStatus(`${activeModel.name} 已载入，可拖拽旋转或滚轮缩放。`);
                 setIsProcessing(false);
@@ -178,6 +211,22 @@ export function ModelViewerPanel() {
           <div className="model-loading">
             <Box size={26} />
             <span>正在处理模型</span>
+          </div>
+        ) : null}
+
+        {structuralColor ? (
+          <div className="structure-legend">
+            {STRUCTURE_BANDS.map((band) => (
+              <div className="legend-item" key={band.label}>
+                <span
+                  className="legend-swatch"
+                  style={{
+                    background: `rgb(${Math.round(band.color[0] * 255)},${Math.round(band.color[1] * 255)},${Math.round(band.color[2] * 255)})`
+                  }}
+                />
+                <span>{band.label}</span>
+              </div>
+            ))}
           </div>
         ) : null}
       </div>
@@ -232,21 +281,20 @@ function SceneLighting() {
 
 function LoadedModel({
   src,
+  structuralColor,
   onLoad,
   onError
 }: {
   src: string;
+  structuralColor: boolean;
   onLoad: () => void;
   onError: () => void;
 }) {
-  const { camera } = useThree();
   let gltf: { scene: THREE.Group };
 
   try {
     gltf = useLoader(GLTFLoader, src);
   } catch (error) {
-    // useLoader throws a promise for suspense; rethrow that.
-    // Only catch real errors.
     if (error instanceof Promise) throw error;
     onError();
     return null;
@@ -255,7 +303,6 @@ function LoadedModel({
   const processedScene = useMemo(() => {
     const scene = gltf.scene.clone(true);
 
-    // ── 材质修复：为缺失材质的 mesh 补上默认材质 ──
     const defaultMaterial = new THREE.MeshStandardMaterial({
       color: 0xb0a898,
       roughness: 0.55,
@@ -264,56 +311,99 @@ function LoadedModel({
       envMapIntensity: 1.15
     });
 
-    scene.traverse((node) => {
-      if (!(node instanceof THREE.Mesh)) return;
+    if (structuralColor) {
+      // ── 分色模式：收集所有 mesh，按面片中心 Y 拆分 ──
+      const meshes: THREE.Mesh[] = [];
+      scene.traverse((node) => {
+        if (node instanceof THREE.Mesh) meshes.push(node);
+      });
 
-      // 启用阴影
-      node.castShadow = true;
-      node.receiveShadow = true;
+      for (const mesh of meshes) {
+        const srcGeom = mesh.geometry;
+        const index = srcGeom.index;
+        const positions = srcGeom.getAttribute("position");
+        if (!positions || !index) continue;
 
-      if (!node.material) {
-        node.material = defaultMaterial;
-      } else if (Array.isArray(node.material)) {
-        if (node.material.length === 0) {
-          node.material = defaultMaterial;
+        const bandFaces: number[][] = STRUCTURE_BANDS.map(() => []);
+        for (let f = 0; f < index.count; f += 3) {
+          const ia = index.getX(f);
+          const ib = index.getX(f + 1);
+          const ic = index.getX(f + 2);
+          const cy = (positions.getY(ia) + positions.getY(ib) + positions.getY(ic)) / 3;
+          for (let bi = 0; bi < STRUCTURE_BANDS.length; bi++) {
+            if (cy <= STRUCTURE_BANDS[bi].maxY) {
+              bandFaces[bi].push(ia, ib, ic);
+              break;
+            }
+          }
         }
-      } else {
-        // 已有材质：增强渲染
-        const mat = node.material as THREE.MeshStandardMaterial;
-        if (mat.isMeshStandardMaterial) {
-          mat.side = THREE.DoubleSide;
-          mat.envMapIntensity = Math.max(mat.envMapIntensity ?? 0, 1.15);
+
+        const parent = mesh.parent ?? scene;
+        for (let bi = 0; bi < STRUCTURE_BANDS.length; bi++) {
+          if (bandFaces[bi].length === 0) continue;
+          const subGeom = srcGeom.clone();
+          subGeom.setIndex(bandFaces[bi]);
+          const [r, g, b] = STRUCTURE_BANDS[bi].color;
+          const subMesh = new THREE.Mesh(
+            subGeom,
+            new THREE.MeshStandardMaterial({
+              color: new THREE.Color(r, g, b),
+              roughness: 0.45,
+              metalness: 0.02,
+              side: THREE.DoubleSide,
+            })
+          );
+          subMesh.castShadow = true;
+          subMesh.receiveShadow = true;
+          parent.add(subMesh);
         }
+        parent.remove(mesh);
       }
-    });
+    } else {
+      // ── 原始模式：修复/增强材质 ──
+      scene.traverse((node) => {
+        if (!(node instanceof THREE.Mesh)) return;
+        node.castShadow = true;
+        node.receiveShadow = true;
+        if (!node.material) {
+          node.material = defaultMaterial;
+        } else if (Array.isArray(node.material)) {
+          if (node.material.length === 0) {
+            node.material = defaultMaterial;
+          }
+        } else {
+          const mat = node.material as THREE.MeshStandardMaterial;
+          if (mat.isMeshStandardMaterial) {
+            mat.side = THREE.DoubleSide;
+            mat.envMapIntensity = Math.max(mat.envMapIntensity ?? 0, 1.15);
+          }
+        }
+      });
+    }
 
     // ── 自动居中 + 缩放适配视口 ──
     const box = new THREE.Box3().setFromObject(scene);
-    const center = box.getCenter(new THREE.Vector3());
     const size = box.getSize(new THREE.Vector3());
     const maxDim = Math.max(size.x, size.y, size.z);
-
-    // 目标尺寸：让最大维度约为 2.5 单位
     const targetSize = 2.5;
     const scale = maxDim > 0 ? targetSize / maxDim : 1;
     scene.scale.setScalar(scale);
 
-    // 居中：平移使中心在原点，底部在 y=0
     const scaledBox = new THREE.Box3().setFromObject(scene);
     const scaledCenter = scaledBox.getCenter(new THREE.Vector3());
     const scaledMin = scaledBox.min;
     scene.position.sub(scaledCenter);
-    scene.position.y -= scaledMin.y - scaledCenter.y; // 底部对齐 y=0
+    scene.position.y -= scaledMin.y - scaledCenter.y;
 
     return scene;
-  }, [gltf]);
+  }, [gltf, structuralColor]);
 
-  // 加载完成回调
   useEffect(() => {
     onLoad();
   }, [processedScene]);
 
-  return <primitive object={processedScene} />;
+  const sceneKey = `${src}-${structuralColor}`;
+  return <primitive key={sceneKey} object={processedScene} />;
 }
 
 // ─── OBJ → GLB 转换（在 Canvas 外部执行）────────────────────────

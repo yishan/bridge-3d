@@ -814,6 +814,39 @@ h1, h2, h3 {
   font-family: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
 }
 
+.structure-legend {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-size: 11.5px;
+  font-family: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
+  color: #4e463c;
+  pointer-events: none;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  flex-shrink: 0;
+}
+
 .model-viewer-footnote {
   display: flex;
   align-items: center;
