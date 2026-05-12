@@ -729,6 +729,46 @@ h1, h2, h3 {
   box-shadow: var(--shadow-sm);
 }
 
+.model-select-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.model-select {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 34px 0 14px;
+  color: #4e463c;
+  border: 1px solid #d4cec4;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.72);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
+  transition: background 0.14s ease, box-shadow 0.14s ease;
+}
+
+.model-select:hover {
+  background: #ece7dc;
+  box-shadow: var(--shadow-sm);
+}
+
+.model-select:focus-visible {
+  outline: 2px solid #8d9b6e;
+  outline-offset: 2px;
+}
+
+.model-select-icon {
+  position: absolute;
+  right: 10px;
+  pointer-events: none;
+  color: #a9a397;
+}
+
 .model-upload-input {
   position: absolute;
   width: 1px;

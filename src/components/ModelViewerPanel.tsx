@@ -5,9 +5,17 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter.js";
 import * as THREE from "three";
-import { AlertCircle, Box, RotateCcw, Upload } from "lucide-react";
+import { AlertCircle, Box, ChevronDown, RotateCcw, Upload } from "lucide-react";
 
-const DEFAULT_MODEL_PATH = "/models/bridge.glb";
+const DEFAULT_MODEL = { id: "bridge", name: "bridge.glb", src: "/models/bridge.glb" };
+
+const EXTRA_MODELS = [
+  { id: "model-1", name: "Model 1", src: "/models/Model 1.glb" },
+  { id: "model-2", name: "Model 2", src: "/models/Model 2.glb" },
+  { id: "model-3", name: "Model 3", src: "/models/Model 3.glb" },
+] as const;
+
+const ALL_MODELS = [DEFAULT_MODEL, ...EXTRA_MODELS];
 
 type ActiveModel = {
   name: string;
@@ -20,8 +28,8 @@ type ActiveModel = {
 export function ModelViewerPanel() {
   const uploadInputId = useId();
   const [activeModel, setActiveModel] = useState<ActiveModel>({
-    name: "bridge.glb",
-    src: DEFAULT_MODEL_PATH,
+    name: DEFAULT_MODEL.name,
+    src: DEFAULT_MODEL.src,
     source: "默认桥梁模型"
   });
   const [status, setStatus] = useState("正在载入模型...");
@@ -79,28 +87,40 @@ export function ModelViewerPanel() {
     }
   };
 
-  const resetModel = () => {
-    setActiveModel({ name: "bridge.glb", src: DEFAULT_MODEL_PATH, source: "默认桥梁模型" });
+  const selectPreset = (id: string) => {
+    const preset = ALL_MODELS.find((m) => m.id === id);
+    if (!preset) return;
+    const source = preset.id === DEFAULT_MODEL.id ? "默认桥梁模型" : "预设模型";
+    setActiveModel({ name: preset.name, src: preset.src, source });
     setStatus("正在载入模型...");
+    setIsProcessing(true);
   };
 
   return (
     <div className="model-viewer-panel">
       <div className="model-viewer-header">
         <div>
-          <span className="model-viewer-kicker">外部模型预览</span>
+          <span className="model-viewer-kicker">模型预览</span>
           <h3>{activeModel.name}</h3>
           <p>{activeModel.source}</p>
         </div>
         <div className="model-actions">
+          <div className="model-select-wrapper">
+            <select
+              className="model-select"
+              onChange={(e) => selectPreset(e.target.value)}
+              value={ALL_MODELS.find((m) => m.src === activeModel.src)?.id ?? ""}
+            >
+              {ALL_MODELS.map((m) => (
+                <option key={m.id} value={m.id}>{m.name}</option>
+              ))}
+            </select>
+            <ChevronDown className="model-select-icon" size={16} />
+          </div>
           <label className="model-action" htmlFor={uploadInputId}>
             <Upload size={18} />
-            上传模型
+            上传
           </label>
-          <button className="model-action secondary" onClick={resetModel} type="button">
-            <RotateCcw size={18} />
-            重置
-          </button>
         </div>
       </div>
 
