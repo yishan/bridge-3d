@@ -76,22 +76,22 @@ describe("bridge component teaching data", () => {
   it("provides matching navigation tones for each structure layer", () => {
     expect(categoryUiColors).toEqual({
       superstructure: {
-        accent: "#1f76d2",
-        accentStrong: "#0f4f9a",
-        hover: "rgba(31, 118, 210, 0.1)",
-        selected: "rgba(31, 118, 210, 0.18)"
+        accent: "#8d9b6e",
+        accentStrong: "#4a5228",
+        hover: "rgba(141, 155, 110, 0.1)",
+        selected: "rgba(141, 155, 110, 0.16)"
       },
       substructure: {
-        accent: "#2f8f72",
-        accentStrong: "#1f6c56",
-        hover: "rgba(47, 143, 114, 0.1)",
-        selected: "rgba(47, 143, 114, 0.18)"
+        accent: "#7a9080",
+        accentStrong: "#4a6458",
+        hover: "rgba(122, 144, 128, 0.1)",
+        selected: "rgba(122, 144, 128, 0.16)"
       },
       foundation: {
-        accent: "#e69a32",
-        accentStrong: "#a76513",
-        hover: "rgba(230, 154, 50, 0.12)",
-        selected: "rgba(230, 154, 50, 0.2)"
+        accent: "#b8894a",
+        accentStrong: "#7a5420",
+        hover: "rgba(184, 137, 74, 0.1)",
+        selected: "rgba(184, 137, 74, 0.18)"
       }
     });
   });

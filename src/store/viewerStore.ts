@@ -1,9 +1,9 @@
 import { create } from "zustand";
 import { loadPathComponentIds, type BridgeCategory } from "../lib/bridgeData";
+import type { DisplayMode } from "../lib/viewConfig";
 
 export type ActiveView = "overall" | BridgeCategory | "knowledge" | "quiz";
 export type LayerMode = "all" | BridgeCategory;
-export type DisplayMode = "2d" | "3d";
 
 type ViewerState = {
   activeView: ActiveView;

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   defaultViewTitle,
+  displayModeOptions,
   headerUtilityActions,
   knowledgeCardButtonVisible,
   twoDViewModes
@@ -23,6 +24,14 @@ describe("viewer UI configuration", () => {
     expect(twoDViewModes).toEqual([
       { id: "top", label: "顶视图" },
       { id: "side", label: "侧视图" }
+    ]);
+  });
+
+  it("adds the uploaded model viewer as a first-class display mode", () => {
+    expect(displayModeOptions).toEqual([
+      { id: "2d", label: "2D" },
+      { id: "3d", label: "3D" },
+      { id: "model", label: "模型" }
     ]);
   });
 });

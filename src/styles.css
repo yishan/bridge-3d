@@ -600,8 +600,9 @@ h1, h2, h3 {
 }
 
 .mode-switch button {
-  width: 60px;
+  min-width: 60px;
   height: 40px;
+  padding: 0 14px;
   color: #4e463c;
   background: transparent;
   cursor: pointer;
@@ -620,6 +621,182 @@ h1, h2, h3 {
 .diagram-2d {
   width: 100%;
   height: 100%;
+}
+
+.model-viewer-fallback,
+.model-viewer-panel {
+  width: 100%;
+  height: 100%;
+}
+
+.model-viewer-fallback {
+  display: grid;
+  place-items: center;
+  color: #6a6050;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
+}
+
+.model-viewer-panel {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 14px;
+  padding: 86px 28px 26px;
+}
+
+.model-viewer-header {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px 20px;
+  border: 1px solid #d7d1c6;
+  border-radius: var(--radius-card);
+  background: rgba(252, 250, 244, 0.94);
+  box-shadow: var(--shadow-sm);
+}
+
+.model-viewer-kicker {
+  display: inline-flex;
+  margin-bottom: 6px;
+  color: var(--sage-700);
+  font-size: 11.5px;
+  font-weight: 700;
+  font-family: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.model-viewer-header h3 {
+  margin: 0;
+  color: #363d1f;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.model-viewer-header p {
+  margin: 5px 0 0;
+  color: #6a6050;
+  font-size: 13px;
+  font-family: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
+}
+
+.model-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.model-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 112px;
+  height: 40px;
+  padding: 0 14px;
+  color: #f0ece2;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  background: linear-gradient(180deg, #8d9b6e, #6f7c33);
+  box-shadow: 0 8px 18px rgba(80, 95, 40, 0.16);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
+  text-decoration: none;
+  transition: transform 0.14s ease, box-shadow 0.14s ease, background 0.14s ease;
+}
+
+.model-action.secondary {
+  color: #4e463c;
+  border-color: #d4cec4;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: none;
+}
+
+.model-action:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(80, 95, 40, 0.2);
+}
+
+.model-action.secondary:hover {
+  background: #ece7dc;
+  box-shadow: var(--shadow-sm);
+}
+
+.model-upload-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.model-viewer-surface {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid #d7d1c6;
+  border-radius: var(--radius-panel);
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255, 255, 255, 0.82), transparent 32%),
+    linear-gradient(rgba(80, 75, 55, 0.036) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(80, 75, 55, 0.036) 1px, transparent 1px),
+    linear-gradient(180deg, #eee9dd, #d7d1c6);
+  background-size: auto, 26px 26px, 26px 26px, auto;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), var(--shadow-sm);
+}
+
+.model-viewer-element {
+  width: 100%;
+  height: 100%;
+  min-height: 420px;
+  background: transparent;
+  --poster-color: transparent;
+  --progress-bar-color: #6f7c33;
+  --progress-bar-height: 3px;
+}
+
+.model-loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  gap: 10px;
+  color: #4e463c;
+  background: rgba(245, 242, 234, 0.72);
+  backdrop-filter: blur(8px);
+  font-size: 14px;
+  font-weight: 700;
+  font-family: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
+}
+
+.model-viewer-footnote {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 10px 14px;
+  color: #6a6050;
+  border: 1px solid #d7d1c6;
+  border-radius: var(--radius-card);
+  background: rgba(252, 250, 244, 0.88);
+  box-shadow: var(--shadow-sm);
+  font-size: 12.5px;
+  line-height: 1.5;
+  font-family: "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
+}
+
+.model-viewer-footnote svg {
+  flex: 0 0 auto;
+  color: var(--sage-700);
 }
 
 .scene-label {

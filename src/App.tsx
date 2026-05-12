@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties } from "react";
+import { lazy, Suspense, useEffect, useState, type CSSProperties } from "react";
 import {
   BookOpen,
   ChevronDown,
@@ -25,12 +25,18 @@ import {
 } from "./lib/bridgeData";
 import {
   defaultViewTitle,
+  displayModeOptions,
   headerUtilityActions,
   knowledgeCardButtonVisible
 } from "./lib/viewConfig";
 import { useViewerStore } from "./store/viewerStore";
 
 const groupOrder: BridgeCategory[] = ["superstructure", "substructure", "foundation"];
+const ModelViewerPanel = lazy(() =>
+  import("./components/ModelViewerPanel").then((module) => ({
+    default: module.ModelViewerPanel
+  }))
+);
 
 function App() {
   const [isImmersive, setIsImmersive] = useState(false);
@@ -113,24 +119,26 @@ function App() {
               </p>
             </div>
             <div className="mode-switch" aria-label="视图模式">
-              <button
-                className={displayMode === "2d" ? "active" : ""}
-                onClick={() => setDisplayMode("2d")}
-                type="button"
-              >
-                2D
-              </button>
-              <button
-                className={displayMode === "3d" ? "active" : ""}
-                onClick={() => setDisplayMode("3d")}
-                type="button"
-              >
-                3D
-              </button>
+              {displayModeOptions.map((mode) => (
+                <button
+                  className={displayMode === mode.id ? "active" : ""}
+                  key={mode.id}
+                  onClick={() => setDisplayMode(mode.id)}
+                  type="button"
+                >
+                  {mode.label}
+                </button>
+              ))}
             </div>
           </div>
 
-          <BridgeViewer />
+          {displayMode === "model" ? (
+            <Suspense fallback={<div className="model-viewer-fallback">正在载入模型查看器...</div>}>
+              <ModelViewerPanel />
+            </Suspense>
+          ) : (
+            <BridgeViewer />
+          )}
 
           {loadPathActive ? (
             <div className="load-path-callout">
