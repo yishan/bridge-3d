@@ -1,15 +1,11 @@
-import "@google/model-viewer";
-import {
-  createElement,
-  useEffect,
-  useId,
-  useRef,
-  useState,
-  type ChangeEvent,
-  type RefObject
-} from "react";
+import { Suspense, useEffect, useId, useMemo, useRef, useState, type ChangeEvent } from "react";
+import { Canvas, useLoader, useThree } from "@react-three/fiber";
+import { ContactShadows, OrbitControls } from "@react-three/drei";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
+import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter.js";
+import * as THREE from "three";
 import { AlertCircle, Box, RotateCcw, Upload } from "lucide-react";
-import type { Material, Mesh, Object3D, Group } from "three";
 
 const DEFAULT_MODEL_PATH = "/models/bridge.glb";
 
@@ -19,6 +15,8 @@ type ActiveModel = {
   source: string;
 };
 
+// ─── 主面板 ──────────────────────────────────────────────────────
+
 export function ModelViewerPanel() {
   const uploadInputId = useId();
   const [activeModel, setActiveModel] = useState<ActiveModel>({
@@ -26,17 +24,15 @@ export function ModelViewerPanel() {
     src: DEFAULT_MODEL_PATH,
     source: "默认桥梁模型"
   });
-  const [status, setStatus] = useState("正在载入默认模型...");
+  const [status, setStatus] = useState("正在载入模型...");
   const [isProcessing, setIsProcessing] = useState(false);
-  const modelViewerRef = useRef<HTMLElement | null>(null);
   const blobUrlsRef = useRef<string[]>([]);
 
-  const trackAndReturn = (url: string) => {
+  const track = (url: string) => {
     blobUrlsRef.current.push(url);
     return url;
   };
 
-  // 清理所有 blob URL
   useEffect(() => {
     return () => {
       for (const url of blobUrlsRef.current) {
@@ -45,36 +41,13 @@ export function ModelViewerPanel() {
     };
   }, []);
 
-  // model-viewer 事件监听
-  useEffect(() => {
-    const viewer = modelViewerRef.current;
-    if (!viewer) return undefined;
-
-    const handleLoad = () => {
-      setStatus(`${activeModel.name} 已载入，可拖拽旋转或滚轮缩放。`);
-      setIsProcessing(false);
-    };
-    const handleError = () => {
-      setStatus("模型渲染失败，请确认文件格式有效。");
-      setIsProcessing(false);
-    };
-
-    viewer.addEventListener("load", handleLoad);
-    viewer.addEventListener("error", handleError);
-
-    return () => {
-      viewer.removeEventListener("load", handleLoad);
-      viewer.removeEventListener("error", handleError);
-    };
-  }, [activeModel]);
-
   const handleUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    const extension = file.name.split(".").pop()?.toLowerCase();
+    const ext = file.name.split(".").pop()?.toLowerCase();
 
-    if (extension !== "glb" && extension !== "obj") {
+    if (ext !== "glb" && ext !== "obj") {
       setStatus("请选择 .glb 或 .obj 模型文件。");
       event.target.value = "";
       return;
@@ -84,27 +57,31 @@ export function ModelViewerPanel() {
       setIsProcessing(true);
       setStatus(`正在处理 ${file.name}...`);
 
-      if (extension === "glb") {
-        // GLB: 检测是否缺材质，缺则补，不缺则直接用
-        const arrayBuffer = await file.arrayBuffer();
-        const src = await prepareGlb(arrayBuffer, trackAndReturn);
-        setActiveModel({ name: file.name, src, source: "用户上传 GLB" });
+      let src: string;
+
+      if (ext === "obj") {
+        src = await convertObjToGlbUrl(file, track);
       } else {
-        // OBJ: 必须转换为 GLB
-        const src = await convertObjToGlbUrl(file, trackAndReturn);
-        setActiveModel({ name: file.name, src, source: "用户上传 OBJ（已转换）" });
+        const blob = new Blob([await file.arrayBuffer()], { type: "model/gltf-binary" });
+        src = track(URL.createObjectURL(blob));
       }
+
+      setActiveModel({
+        name: file.name,
+        src,
+        source: ext === "obj" ? "用户上传 OBJ（已转换）" : "用户上传 GLB"
+      });
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "模型处理失败。");
-      setIsProcessing(false);
     } finally {
+      setIsProcessing(false);
       event.target.value = "";
     }
   };
 
-  const loadDefault = () => {
+  const resetModel = () => {
     setActiveModel({ name: "bridge.glb", src: DEFAULT_MODEL_PATH, source: "默认桥梁模型" });
-    setStatus("正在载入默认模型...");
+    setStatus("正在载入模型...");
   };
 
   return (
@@ -120,7 +97,7 @@ export function ModelViewerPanel() {
             <Upload size={18} />
             上传模型
           </label>
-          <button className="model-action secondary" onClick={loadDefault} type="button">
+          <button className="model-action secondary" onClick={resetModel} type="button">
             <RotateCcw size={18} />
             重置
           </button>
@@ -136,24 +113,46 @@ export function ModelViewerPanel() {
       />
 
       <div className="model-viewer-surface">
-        {createElement("model-viewer", {
-          alt: `${activeModel.name} 三维模型`,
-          "auto-rotate": "",
-          "camera-controls": "",
-          className: "model-viewer-element",
-          "environment-image": "neutral",
-          exposure: "1.2",
-          "interaction-prompt": "auto",
-          key: activeModel.src,
-          loading: "eager",
-          ref: modelViewerRef,
-          reveal: "auto",
-          "rotation-per-second": "28deg",
-          "shadow-intensity": "0.82",
-          "shadow-softness": "0.72",
-          src: activeModel.src,
-          "touch-action": "pan-y"
-        })}
+        <Canvas
+          camera={{ position: [0, 0.6, 4.5], fov: 35 }}
+          className="model-viewer-canvas"
+          dpr={[1, 1.8]}
+          gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.1 }}
+          shadows="basic"
+        >
+          <color attach="background" args={["#f0ece2"]} />
+          <SceneLighting />
+          <Suspense fallback={null}>
+            <LoadedModel
+              key={activeModel.src}
+              src={activeModel.src}
+              onLoad={() => {
+                setStatus(`${activeModel.name} 已载入，可拖拽旋转或滚轮缩放。`);
+                setIsProcessing(false);
+              }}
+              onError={() => {
+                setStatus("模型加载失败，请确认文件格式有效。");
+                setIsProcessing(false);
+              }}
+            />
+          </Suspense>
+          <ContactShadows
+            blur={2.5}
+            far={8}
+            opacity={0.25}
+            position={[0, -0.01, 0]}
+            scale={12}
+          />
+          <OrbitControls
+            dampingFactor={0.08}
+            enableDamping
+            autoRotate
+            autoRotateSpeed={0.45}
+            maxDistance={12}
+            maxPolarAngle={Math.PI / 2.05}
+            minDistance={1.5}
+          />
+        </Canvas>
 
         {isProcessing ? (
           <div className="model-loading">
@@ -171,124 +170,152 @@ export function ModelViewerPanel() {
   );
 }
 
-// ─── GLB 快速检测 + 按需补材质 ──────────────────────────────────
+// ─── 灯光组（参考 3DCellForge 5 灯组合）─────────────────────────
 
-/**
- * 只解析 GLB 的 JSON 头部，判断是否有 materials。
- * 有材质 → 直接作为 blob URL 使用
- * 无材质 → 走 Three.js 补材质再导出
- */
-async function prepareGlb(
-  buffer: ArrayBuffer,
-  track: (url: string) => string
-): Promise<string> {
-  const hasMaterials = glbHasMaterials(buffer);
-
-  if (hasMaterials) {
-    // 直接用原始数据，不做额外处理
-    const blob = new Blob([buffer], { type: "model/gltf-binary" });
-    return track(URL.createObjectURL(blob));
-  }
-
-  // 缺材质，走 Three.js 管线补上
-  return patchMaterialsAndExport(buffer, track);
+function SceneLighting() {
+  return (
+    <>
+      {/* 暖色主光 */}
+      <directionalLight
+        castShadow
+        color="#fff5e6"
+        intensity={3.2}
+        position={[5, 8, 4]}
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
+      />
+      {/* 冷色补光 */}
+      <directionalLight
+        color="#e0ecff"
+        intensity={1.2}
+        position={[-4, 4, -3]}
+      />
+      {/* 环境光 */}
+      <ambientLight intensity={0.55} />
+      {/* 底部反射光 */}
+      <pointLight
+        color="#ffeedd"
+        intensity={0.6}
+        position={[0, -3, 2]}
+      />
+      {/* 侧面点缀光 */}
+      <pointLight
+        color="#d0e8ff"
+        intensity={0.45}
+        position={[-6, 2, -5]}
+      />
+    </>
+  );
 }
 
-/** 解析 GLB 的 JSON chunk，检查 materials 数组是否存在且非空 */
-function glbHasMaterials(buffer: ArrayBuffer): boolean {
+// ─── 模型加载 + 自动居中缩放 + 材质修复 ─────────────────────────
+
+function LoadedModel({
+  src,
+  onLoad,
+  onError
+}: {
+  src: string;
+  onLoad: () => void;
+  onError: () => void;
+}) {
+  const { camera } = useThree();
+  let gltf: { scene: THREE.Group };
+
   try {
-    const view = new DataView(buffer);
-    // GLB header: magic(4) + version(4) + length(4) = 12 bytes
-    // Chunk 0 header: chunkLength(4) + chunkType(4) = 8 bytes
-    const jsonLength = view.getUint32(12, true);
-    const decoder = new TextDecoder();
-    const jsonStr = decoder.decode(new Uint8Array(buffer, 20, jsonLength));
-    const json = JSON.parse(jsonStr);
-    return Array.isArray(json.materials) && json.materials.length > 0;
-  } catch {
-    return false;
+    gltf = useLoader(GLTFLoader, src);
+  } catch (error) {
+    // useLoader throws a promise for suspense; rethrow that.
+    // Only catch real errors.
+    if (error instanceof Promise) throw error;
+    onError();
+    return null;
   }
-}
 
-/** 用 Three.js 加载 GLB，为无材质 mesh 补默认材质，导出为新 GLB blob URL */
-async function patchMaterialsAndExport(
-  buffer: ArrayBuffer,
-  track: (url: string) => string
-): Promise<string> {
-  const [three, { GLTFLoader }, { GLTFExporter }] = await Promise.all([
-    import("three"),
-    import("three/examples/jsm/loaders/GLTFLoader.js"),
-    import("three/examples/jsm/exporters/GLTFExporter.js")
-  ]);
+  const processedScene = useMemo(() => {
+    const scene = gltf.scene.clone(true);
 
-  // 用 blob URL 供 GLTFLoader 加载
-  const tempUrl = track(
-    URL.createObjectURL(new Blob([buffer], { type: "model/gltf-binary" }))
-  );
+    // ── 材质修复：为缺失材质的 mesh 补上默认材质 ──
+    const defaultMaterial = new THREE.MeshStandardMaterial({
+      color: 0xb0a898,
+      roughness: 0.55,
+      metalness: 0.08,
+      side: THREE.DoubleSide,
+      envMapIntensity: 1.15
+    });
 
-  const gltf = await new Promise<{ scene: Group }>((resolve, reject) => {
-    new GLTFLoader().load(tempUrl, resolve, undefined, reject);
-  });
+    scene.traverse((node) => {
+      if (!(node instanceof THREE.Mesh)) return;
 
-  const defaultMaterial = new three.MeshStandardMaterial({
-    color: 0xb0a898,
-    roughness: 0.65,
-    metalness: 0.05
-  });
+      // 启用阴影
+      node.castShadow = true;
+      node.receiveShadow = true;
 
-  gltf.scene.traverse((node: Object3D) => {
-    if (node instanceof three.Mesh) {
-      const mesh = node as Mesh;
-      if (!mesh.material) {
-        mesh.material = defaultMaterial;
-      } else if (Array.isArray(mesh.material) && mesh.material.length === 0) {
-        mesh.material = defaultMaterial;
+      if (!node.material) {
+        node.material = defaultMaterial;
+      } else if (Array.isArray(node.material)) {
+        if (node.material.length === 0) {
+          node.material = defaultMaterial;
+        }
+      } else {
+        // 已有材质：增强渲染
+        const mat = node.material as THREE.MeshStandardMaterial;
+        if (mat.isMeshStandardMaterial) {
+          mat.side = THREE.DoubleSide;
+          mat.envMapIntensity = Math.max(mat.envMapIntensity ?? 0, 1.15);
+        }
       }
-    }
-  });
+    });
 
-  const result = await new GLTFExporter().parseAsync(gltf.scene, { binary: true });
+    // ── 自动居中 + 缩放适配视口 ──
+    const box = new THREE.Box3().setFromObject(scene);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
 
-  if (!(result instanceof ArrayBuffer)) {
-    throw new Error("模型导出失败。");
-  }
+    // 目标尺寸：让最大维度约为 2.5 单位
+    const targetSize = 2.5;
+    const scale = maxDim > 0 ? targetSize / maxDim : 1;
+    scene.scale.setScalar(scale);
 
-  return track(
-    URL.createObjectURL(new Blob([result], { type: "model/gltf-binary" }))
-  );
+    // 居中：平移使中心在原点，底部在 y=0
+    const scaledBox = new THREE.Box3().setFromObject(scene);
+    const scaledCenter = scaledBox.getCenter(new THREE.Vector3());
+    const scaledMin = scaledBox.min;
+    scene.position.sub(scaledCenter);
+    scene.position.y -= scaledMin.y - scaledCenter.y; // 底部对齐 y=0
+
+    return scene;
+  }, [gltf]);
+
+  // 加载完成回调
+  useEffect(() => {
+    onLoad();
+  }, [processedScene]);
+
+  return <primitive object={processedScene} />;
 }
 
-// ─── OBJ → GLB 转换 ─────────────────────────────────────────────
+// ─── OBJ → GLB 转换（在 Canvas 外部执行）────────────────────────
 
 async function convertObjToGlbUrl(
   file: File,
   track: (url: string) => string
 ): Promise<string> {
-  const [three, { OBJLoader }, { GLTFExporter }] = await Promise.all([
-    import("three"),
-    import("three/examples/jsm/loaders/OBJLoader.js"),
-    import("three/examples/jsm/exporters/GLTFExporter.js")
-  ]);
-
   const source = await file.text();
   const object = new OBJLoader().parse(source);
   object.name = file.name.replace(/\.obj$/i, "");
 
-  // OBJ 导入的 mesh 默认没有标准材质，统一补上
-  const defaultMaterial = new three.MeshStandardMaterial({
+  const defaultMaterial = new THREE.MeshStandardMaterial({
     color: 0xb0a898,
-    roughness: 0.65,
-    metalness: 0.05
+    roughness: 0.55,
+    metalness: 0.08
   });
 
-  object.traverse((node: Object3D) => {
-    if (node instanceof three.Mesh) {
-      const mesh = node as Mesh;
-      if (
-        !mesh.material ||
-        (Array.isArray(mesh.material) && mesh.material.length === 0)
-      ) {
-        mesh.material = defaultMaterial;
+  object.traverse((node) => {
+    if (node instanceof THREE.Mesh) {
+      if (!node.material || (Array.isArray(node.material) && node.material.length === 0)) {
+        node.material = defaultMaterial;
       }
     }
   });

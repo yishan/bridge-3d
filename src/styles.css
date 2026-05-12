@@ -754,14 +754,10 @@ h1, h2, h3 {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), var(--shadow-sm);
 }
 
-.model-viewer-element {
-  width: 100%;
-  height: 100%;
+.model-viewer-canvas {
+  width: 100% !important;
+  height: 100% !important;
   min-height: 420px;
-  background: transparent;
-  --poster-color: transparent;
-  --progress-bar-color: #6f7c33;
-  --progress-bar-height: 3px;
 }
 
 .model-loading {
