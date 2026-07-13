@@ -123,7 +123,6 @@ export function ModelViewerPanel() {
     <div className="model-viewer-panel">
       <div className="model-viewer-header">
         <div>
-          <span className="model-viewer-kicker">模型预览</span>
           <h3>{activeModel.name}</h3>
           <p>{activeModel.source}</p>
         </div>
